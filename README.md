@@ -4,7 +4,7 @@
 
 The purpose of the project is two-fold. 
 1. Test out OpenCode for AI-assisted development
-2. Provide a way to aggregate Steam data in to provide insights into game performance without paying. 
+2. Provide a way to aggregate Steam data to provide insights into game performance without paying. 
 
 ### OpenCode
 I've heard a lot of good things regarding OpenCode. The biggest benefit so far is that it's open source. I prefer using open source tooling whenever possible.\
