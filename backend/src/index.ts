@@ -1,5 +1,6 @@
 import express from "express";
 import steamRouter from "./routes/steam.js";
+import { initDb } from "./db/init.js";
 
 const app = express();
 const PORT = process.env.PORT ?? 3001;
@@ -15,6 +16,12 @@ app.get("/", (_req, res) => {
 });
 
 app.use("/api/steam", steamRouter);
+
+try {
+  await initDb();
+} catch (err) {
+  console.error("Failed to initialize database:", (err as Error).message);
+}
 
 app.listen(PORT, () => {
   console.log(`Backend listening on http://localhost:${PORT}`);

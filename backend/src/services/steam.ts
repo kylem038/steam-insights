@@ -53,16 +53,30 @@ export interface AchievementPercentagesResponse {
   };
 }
 
+import pool from "../db/pool.js";
+
 const STEAM_API_BASE = "https://api.steampowered.com";
 const STEAM_STORE_BASE = "https://store.steampowered.com";
+
+async function storeRawResponse(source: string, appId: number, raw: unknown): Promise<void> {
+  try {
+    await pool.query(
+      `INSERT INTO raw_api_responses (source, app_id, payload_json) VALUES ($1, $2, $3)`,
+      [source, appId, JSON.stringify(raw)],
+    );
+  } catch (err) {
+    console.error(`Failed to store ${source} response:`, (err as Error).message);
+  }
+}
 
 export async function fetchAppDetails(appId: number): Promise<SteamAppDetailsResponse[string]["data"] | null> {
   const res = await fetch(`${STEAM_STORE_BASE}/api/appdetails?appids=${appId}`, {
     headers: { "Accept": "application/json" },
   });
   if (!res.ok) throw new Error(`Steam appdetails returned ${res.status}`);
-  const json: SteamAppDetailsResponse = await res.json();
-  const entry = json[String(appId)];
+  const raw = await res.json();
+  await storeRawResponse("appdetails", appId, raw);
+  const entry = (raw as SteamAppDetailsResponse)[String(appId)];
   return entry?.success ? (entry.data ?? null) : null;
 }
 
@@ -72,8 +86,9 @@ export async function fetchCurrentPlayers(appId: number): Promise<number> {
     { headers: { "Accept": "application/json" } },
   );
   if (!res.ok) throw new Error(`Steam current players returned ${res.status}`);
-  const json: CurrentPlayersResponse = await res.json();
-  return json.response.player_count;
+  const raw = await res.json();
+  await storeRawResponse("current_players", appId, raw);
+  return (raw as CurrentPlayersResponse).response.player_count;
 }
 
 export async function fetchReviewsSummary(appId: number): Promise<ReviewsResponse["query_summary"]> {
@@ -82,9 +97,11 @@ export async function fetchReviewsSummary(appId: number): Promise<ReviewsRespons
     { headers: { "Accept": "application/json" } },
   );
   if (!res.ok) throw new Error(`Steam reviews returned ${res.status}`);
-  const json: ReviewsResponse = await res.json();
-  if (!json.success) throw new Error("Steam reviews returned unsuccessful response");
-  return json.query_summary;
+  const raw = await res.json();
+  await storeRawResponse("reviews", appId, raw);
+  const parsed = raw as ReviewsResponse;
+  if (!parsed.success) throw new Error("Steam reviews returned unsuccessful response");
+  return parsed.query_summary;
 }
 
 export async function fetchAchievementPercentages(appId: number): Promise<AchievementPercentagesResponse["achievementpercentages"]["achievements"]> {
@@ -93,6 +110,7 @@ export async function fetchAchievementPercentages(appId: number): Promise<Achiev
     { headers: { "Accept": "application/json" } },
   );
   if (!res.ok) throw new Error(`Steam achievements returned ${res.status}`);
-  const json: AchievementPercentagesResponse = await res.json();
-  return json.achievementpercentages.achievements;
+  const raw = await res.json();
+  await storeRawResponse("achievements", appId, raw);
+  return (raw as AchievementPercentagesResponse).achievementpercentages.achievements;
 }
