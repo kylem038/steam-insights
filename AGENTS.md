@@ -4,7 +4,7 @@
 
 ```
 frontend/   Next.js 16 App Router + React 19 + Tailwind v4 + TypeScript
-backend/    Express 5 (no source yet — only package.json + node_modules)
+backend/    Express 5 + TypeScript (tsx) — src/index.ts entrypoint
 database/   empty (future home for SQL / migrations)
 docs/       empty
 docker-compose.yml   PostgreSQL 18 for local dev
@@ -26,9 +26,8 @@ cd frontend && npm run dev        # Next.js on http://localhost:3000
 cd frontend && npm run lint       # ESLint 9 flat config
 cd frontend && npm run build      # production build
 cd frontend && npm start          # production server
+cd backend && npm run dev         # Express 5 on http://localhost:3001
 ```
-
-Backend (Express) has no `package.json` scripts yet — add them when creating source.
 
 ## Stack quirks
 
@@ -39,4 +38,4 @@ Backend (Express) has no `package.json` scripts yet — add them when creating s
 
 ## Project state
 
-Early-stage scaffold. The frontend is the default `create-next-app` template. The backend has Express installed but zero source files. The database directory is empty — the only DB setup is the `docker-compose.yml`.
+Early-stage scaffold. The frontend is the default `create-next-app` template. The backend has Express installed and a basic server running (hits Steam API at `/api/steam/balatro`). The database directory is empty — the only DB setup is the `docker-compose.yml`.
