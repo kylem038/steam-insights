@@ -3,6 +3,7 @@ import steamRouter from "./routes/steam.js";
 import gamesRouter from "./routes/games.js";
 import { initDb } from "./db/init.js";
 import { seedGame } from "./services/seed.js";
+import { SUPPORTED_APP_IDS } from "./config.js";
 
 const app = express();
 const PORT = process.env.PORT ?? 3001;
@@ -22,7 +23,7 @@ app.use("/api/games", gamesRouter);
 
 try {
   await initDb();
-  await seedGame(2379780);
+  await Promise.all(SUPPORTED_APP_IDS.map(seedGame));
 } catch (err) {
   console.error("Failed to initialize:", (err as Error).message);
 }
