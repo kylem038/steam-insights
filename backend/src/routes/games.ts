@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getGame, getSupportedGames, searchGames } from "../services/games.js";
+import { getGame, getGameDetails, getSupportedGames, searchGames } from "../services/games.js";
 
 const router = Router();
 
@@ -20,6 +20,24 @@ router.get("/search", async (req, res) => {
   }
   const results = await searchGames(q);
   res.json(results);
+});
+
+router.get("/:appId/details", async (req, res, next) => {
+  try {
+    const appId = Number(req.params.appId);
+    if (Number.isNaN(appId)) {
+      res.status(400).json({ error: "Invalid appId" });
+      return;
+    }
+    const detail = await getGameDetails(appId);
+    if (!detail) {
+      res.status(404).json({ error: "Game not found" });
+      return;
+    }
+    res.json(detail);
+  } catch (err) {
+    next(err);
+  }
 });
 
 router.get("/:appId", async (req, res) => {
