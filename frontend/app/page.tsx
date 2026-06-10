@@ -59,9 +59,11 @@ export default async function Home() {
                   {game.name}
                 </h3>
                 <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+                  <span className="text-zinc-400 dark:text-zinc-500">Developer: </span>
                   {game.developer.join(", ")}
                 </p>
                 <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                  <span className="text-zinc-400 dark:text-zinc-500">Publisher: </span>
                   {game.publisher.join(", ")}
                 </p>
               </Link>
