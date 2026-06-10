@@ -1,3 +1,4 @@
+import { SUPPORTED_APP_IDS } from "../config.js";
 import pool from "../db/pool.js";
 
 export interface GameRecord {
@@ -27,6 +28,14 @@ export async function searchGames(query: string): Promise<GameSearchResult[]> {
   const result = await pool.query<GameSearchResult>(
     "SELECT app_id, name FROM games WHERE name ILIKE $1 ORDER BY name LIMIT 10",
     [`${query}%`],
+  );
+  return result.rows;
+}
+
+export async function getSupportedGames(): Promise<GameRecord[]> {
+  const result = await pool.query<GameRecord>(
+    "SELECT * FROM games WHERE app_id = ANY($1) ORDER BY name",
+    [SUPPORTED_APP_IDS],
   );
   return result.rows;
 }
