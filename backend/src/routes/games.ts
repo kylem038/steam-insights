@@ -1,7 +1,16 @@
 import { Router } from "express";
-import { getGame, searchGames } from "../services/games.js";
+import { getGame, getSupportedGames, searchGames } from "../services/games.js";
 
 const router = Router();
+
+router.get("/supported", async (_req, res, next) => {
+  try {
+    const games = await getSupportedGames();
+    res.json(games);
+  } catch (err) {
+    next(err);
+  }
+});
 
 router.get("/search", async (req, res) => {
   const q = String(req.query.q ?? "");

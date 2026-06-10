@@ -7,22 +7,26 @@ import {
 } from "../services/steam.js";
 import { upsertGame } from "../services/games.js";
 
-const BALATRO_APP_ID = 2379780;
-
 const router = Router();
 
-router.get("/balatro", async (_req, res, next) => {
+router.get("/:appId", async (req, res, next) => {
   try {
+    const appId = Number(req.params.appId);
+    if (Number.isNaN(appId)) {
+      res.status(400).json({ error: "Invalid appId" });
+      return;
+    }
+
     const [appDetails, currentPlayers, reviews, achievements] = await Promise.all([
-      fetchAppDetails(BALATRO_APP_ID),
-      fetchCurrentPlayers(BALATRO_APP_ID),
-      fetchReviewsSummary(BALATRO_APP_ID),
-      fetchAchievementPercentages(BALATRO_APP_ID),
+      fetchAppDetails(appId),
+      fetchCurrentPlayers(appId),
+      fetchReviewsSummary(appId),
+      fetchAchievementPercentages(appId),
     ]);
 
     if (appDetails) {
       await upsertGame({
-        appId: BALATRO_APP_ID,
+        appId,
         name: appDetails.name,
         releaseDate: appDetails.release_date.date,
         developers: appDetails.developers,
@@ -31,7 +35,7 @@ router.get("/balatro", async (_req, res, next) => {
     }
 
     res.json({
-      appId: BALATRO_APP_ID,
+      appId,
       name: appDetails?.name ?? null,
       appDetails,
       currentPlayers,
