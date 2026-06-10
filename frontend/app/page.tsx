@@ -1,3 +1,5 @@
+import SearchBar from "./components/SearchBar";
+
 const BALATRO_APP_ID = 2379780;
 
 interface Game {
@@ -32,6 +34,10 @@ export default async function Home() {
         <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
           SteamInsights
         </h1>
+
+        <div className="mb-8 mt-8">
+          <SearchBar />
+        </div>
 
         {error && (
           <p className="mt-8 text-zinc-500 dark:text-zinc-400">{error}</p>

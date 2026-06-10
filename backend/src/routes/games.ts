@@ -1,7 +1,17 @@
 import { Router } from "express";
-import { getGame } from "../services/games.js";
+import { getGame, searchGames } from "../services/games.js";
 
 const router = Router();
+
+router.get("/search", async (req, res) => {
+  const q = String(req.query.q ?? "");
+  if (!q) {
+    res.json([]);
+    return;
+  }
+  const results = await searchGames(q);
+  res.json(results);
+});
 
 router.get("/:appId", async (req, res) => {
   const appId = Number(req.params.appId);

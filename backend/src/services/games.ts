@@ -10,12 +10,25 @@ export interface GameRecord {
   updated_at: Date;
 }
 
+export interface GameSearchResult {
+  app_id: number;
+  name: string;
+}
+
 export async function getGame(appId: number): Promise<GameRecord | null> {
   const result = await pool.query<GameRecord>(
     "SELECT * FROM games WHERE app_id = $1",
     [appId],
   );
   return result.rows[0] ?? null;
+}
+
+export async function searchGames(query: string): Promise<GameSearchResult[]> {
+  const result = await pool.query<GameSearchResult>(
+    "SELECT app_id, name FROM games WHERE name ILIKE $1 ORDER BY name LIMIT 10",
+    [`${query}%`],
+  );
+  return result.rows;
 }
 
 export async function upsertGame(data: {
