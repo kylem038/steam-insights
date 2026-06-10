@@ -1,57 +1,18 @@
 "use client";
 
-import { Autocomplete, TextField } from "@mui/material";
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-
-interface GameOption {
-  app_id: number;
-  name: string;
+interface SearchBarProps {
+  value: string;
+  onChange: (value: string) => void;
 }
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:3001";
-
-export default function SearchBar() {
-  const [inputValue, setInputValue] = useState("");
-  const [options, setOptions] = useState<GameOption[]>([]);
-  const router = useRouter();
-
-  useEffect(() => {
-    if (inputValue === "") return;
-    const timer = setTimeout(async () => {
-      try {
-        const res = await fetch(
-          `${BACKEND_URL}/api/games/search?q=${encodeURIComponent(inputValue)}`,
-        );
-        if (res.ok) {
-          setOptions(await res.json());
-        } else {
-          setOptions([]);
-        }
-      } catch {
-        setOptions([]);
-      }
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [inputValue]);
-
+export default function SearchBar({ value, onChange }: SearchBarProps) {
   return (
-    <Autocomplete
-      options={options}
-      getOptionLabel={(option) => option.name}
-      inputValue={inputValue}
-      onInputChange={(_, value) => setInputValue(value)}
-      onChange={(_, value) => {
-        if (value) {
-          router.push(`/games/${value.app_id}`);
-        }
-      }}
-      renderInput={(params) => (
-        <TextField {...params} label="Search games" variant="outlined" />
-      )}
-      sx={{ width: 400 }}
-      noOptionsText="No games found"
-      isOptionEqualToValue={(option, value) => option.app_id === value.app_id}
+    <input
+      type="text"
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder="Search games…"
+      className="w-full max-w-md rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 py-2.5 text-sm text-zinc-900 dark:text-zinc-50 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-zinc-400 dark:focus:ring-zinc-600 transition-colors"
     />
   );
 }
