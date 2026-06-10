@@ -5,6 +5,7 @@ import {
   fetchReviewsSummary,
   fetchAchievementPercentages,
 } from "../services/steam.js";
+import { upsertGame } from "../services/games.js";
 
 const BALATRO_APP_ID = 2379780;
 
@@ -18,6 +19,16 @@ router.get("/balatro", async (_req, res, next) => {
       fetchReviewsSummary(BALATRO_APP_ID),
       fetchAchievementPercentages(BALATRO_APP_ID),
     ]);
+
+    if (appDetails) {
+      await upsertGame({
+        appId: BALATRO_APP_ID,
+        name: appDetails.name,
+        releaseDate: appDetails.release_date.date,
+        developers: appDetails.developers,
+        publishers: appDetails.publishers,
+      });
+    }
 
     res.json({
       appId: BALATRO_APP_ID,
