@@ -1,0 +1,19 @@
+services:
+  backend:
+    build:
+      target: build
+    command: npx tsx watch src/index.ts
+    volumes:
+      - ./backend/src:/app/src
+
+  frontend:
+    build:
+      target: build
+    environment:
+      NODE_ENV: development
+    command: npm run dev
+    volumes:
+      - ./frontend/app:/app/app
+      - ./frontend/public:/app/public
+      - ./frontend/next.config.ts:/app/next.config.ts
+      - ./frontend/tsconfig.json:/app/tsconfig.json
