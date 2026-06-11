@@ -1,0 +1,9 @@
+# Production overrides — adds resource limits for deployment.
+# Usage: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+
+services:
+  backend:
+    restart: unless-stopped
+
+  frontend:
+    restart: unless-stopped

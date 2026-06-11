@@ -22,3 +22,45 @@ There is some key data that Steam does not expose that is useful, namely number 
 What I've discovered is that this data can be _estimated_, keyword estimated.\
 This is likely why other websites have put that data behind paywalls. They've had to develop algorithms to create useful estimations of these numbers.\
 I will also explore developing some of these algorithms myself, and will always disclose when the data is exact and when data has been run through some estimation algorithm.
+
+## Running the project
+
+### Prerequisites
+
+- Install Docker
+- Copy `.env.example` to `.env` and adjust values if needed
+
+### Docker Compose files
+
+The project uses three Compose files to separate concerns:
+
+| `docker-compose.yml` | Shared base (PostgreSQL, ports, environment variables, dependencies between services) |
+| `docker-compose.dev.yml` | Local development overrides (hot-reload via volume mounts, `NODE_ENV=development`) |
+| `docker-compose.prod.yml` | Production overrides (`restart: unless-stopped` on services) |
+
+Run multiple files together with the `-f` flag:
+
+```sh
+# Development
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+
+# Production
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+```
+
+### Useful commands
+
+| Start (development) | `docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d` |
+| Start (production) | `docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build` |
+| Stop | `docker compose down` |
+| Stop and delete volumes | `docker compose down -v` |
+| Rebuild a service | `docker compose build [service]` or add `--build` to `up` |
+| View logs (all) | `docker compose logs -f` |
+| View logs (one service) | `docker compose logs -f [service]` |
+| List containers | `docker compose ps` |
+
+### Access
+
+- **Frontend:** [http://localhost:3000](http://localhost:3000)
+- **Backend API:** [http://localhost:3001](http://localhost:3001)
+- **PostgreSQL:** `localhost:5432`
