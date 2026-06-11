@@ -4,6 +4,11 @@ import gamesRouter from "./routes/games.js";
 import { initDb } from "./db/init.js";
 import { seedGame } from "./services/seed.js";
 import { SUPPORTED_APP_IDS } from "./config.js";
+import {
+  startPlayerPoller,
+  startReviewPoller,
+  startPricePoller,
+} from "./services/poller.js";
 
 const app = express();
 const PORT = process.env.PORT ?? 3001;
@@ -24,6 +29,10 @@ app.use("/api/games", gamesRouter);
 try {
   await initDb();
   await Promise.all(SUPPORTED_APP_IDS.map(seedGame));
+  const appIds = [...SUPPORTED_APP_IDS];
+  startPlayerPoller(appIds);
+  startReviewPoller(appIds);
+  startPricePoller(appIds);
 } catch (err) {
   console.error("Failed to initialize:", (err as Error).message);
 }
