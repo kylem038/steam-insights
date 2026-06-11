@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Timestamp } from "../../components/Timestamp";
 
 interface GameDetail {
   app_id: number;
@@ -139,7 +140,7 @@ export default async function GamePage({
 
         {detail.snapshots_updated_at && (
           <p className="mt-8 text-xs text-zinc-400 dark:text-zinc-600">
-            Data as of {new Date(detail.snapshots_updated_at).toLocaleString()}
+            Data as of <Timestamp iso={detail.snapshots_updated_at} />
           </p>
         )}
       </main>
