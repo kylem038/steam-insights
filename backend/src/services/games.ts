@@ -64,6 +64,7 @@ export interface GameDetail {
   release_date: string | null;
   developer: string[];
   publisher: string[];
+  tags: string[];
   current_players: number | null;
   reviews: {
     total: number;
@@ -103,6 +104,61 @@ export async function storePriceSnapshot(appId: number, priceUsd: number, discou
   );
 }
 
+export async function storeGameTags(appId: number, tagNames: string[]): Promise<void> {
+  if (tagNames.length === 0) return;
+
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+
+    const values = tagNames.map((_, i) => `($${i + 1})`).join(", ");
+    await client.query(
+      `INSERT INTO tags (name) VALUES ${values} ON CONFLICT (name) DO NOTHING`,
+      tagNames,
+    );
+
+    const idRes = await client.query<{ id: number; name: string }>(
+      `SELECT id, name FROM tags WHERE name = ANY($1)`,
+      [tagNames],
+    );
+    const tagIdMap = new Map<string, number>();
+    for (const row of idRes.rows) {
+      tagIdMap.set(row.name, row.id);
+    }
+    if (tagIdMap.size === 0) return;
+
+    await client.query("DELETE FROM game_tags WHERE app_id = $1", [appId]);
+
+    const entries: { tagId: number; ordinal: number }[] = [];
+    for (let i = 0; i < tagNames.length; i++) {
+      const tagId = tagIdMap.get(tagNames[i]);
+      if (tagId != null) {
+        entries.push({ tagId, ordinal: i });
+      }
+    }
+
+    if (entries.length > 0) {
+      const gtValues = entries.map((_, i) => `($1, $${i * 2 + 2}, $${i * 2 + 3})`).join(", ");
+      const params: (number | string)[] = [appId];
+      for (const e of entries) {
+        params.push(e.tagId, e.ordinal);
+      }
+      await client.query(
+        `INSERT INTO game_tags (app_id, tag_id, ordinal) VALUES ${gtValues}
+         ON CONFLICT (app_id, tag_id) DO UPDATE SET ordinal = EXCLUDED.ordinal`,
+        params,
+      );
+    }
+
+    await client.query("COMMIT");
+  } catch (err) {
+    await client.query("ROLLBACK");
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
 export async function getGameDetails(appId: number): Promise<GameDetail | null> {
   const game = await getGame(appId);
   if (!game) return null;
@@ -117,6 +173,13 @@ export async function getGameDetails(appId: number): Promise<GameDetail | null> 
   );
   const price = await pool.query<PriceSnapshot>(
     "SELECT price_usd, discount_percent, timestamp FROM price_history WHERE app_id = $1 ORDER BY timestamp DESC LIMIT 1",
+    [appId],
+  );
+  const tagsRes = await pool.query<{ name: string }>(
+    `SELECT t.name FROM tags t
+     JOIN game_tags gt ON gt.tag_id = t.id
+     WHERE gt.app_id = $1
+     ORDER BY gt.ordinal`,
     [appId],
   );
 
@@ -135,6 +198,7 @@ export async function getGameDetails(appId: number): Promise<GameDetail | null> 
     release_date: game.release_date,
     developer: game.developer,
     publisher: game.publisher,
+    tags: tagsRes.rows.map((r) => r.name),
     current_players: players.rows[0]?.current_players ?? null,
     reviews: reviews.rows[0]
       ? {

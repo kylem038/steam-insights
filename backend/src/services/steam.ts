@@ -104,6 +104,24 @@ export async function fetchReviewsSummary(appId: number): Promise<ReviewsRespons
   return parsed.query_summary;
 }
 
+export async function fetchGameTags(appId: number): Promise<string[]> {
+  const res = await fetch(`${STEAM_STORE_BASE}/app/${appId}?l=english`, {
+    headers: { "Accept": "text/html" },
+  });
+  if (!res.ok) throw new Error(`Steam store page returned ${res.status}`);
+  const html = await res.text();
+  await storeRawResponse("store_page", appId, { length: html.length });
+
+  const re = /<a[^>]*class="app_tag"[^>]*>([^<]+)<\/a>/g;
+  const tags: string[] = [];
+  let match: RegExpExecArray | null;
+  while ((match = re.exec(html)) !== null) {
+    const tag = match[1].trim();
+    if (tag && !tags.includes(tag)) tags.push(tag);
+  }
+  return tags;
+}
+
 export async function fetchAchievementPercentages(appId: number): Promise<AchievementPercentagesResponse["achievementpercentages"]["achievements"]> {
   const res = await fetch(
     `${STEAM_API_BASE}/ISteamUserStats/GetGlobalAchievementPercentagesForApp/v2/?gameid=${appId}`,
