@@ -26,11 +26,14 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-function formatTime(iso: string) {
-  return new Date(iso).toLocaleDateString(undefined, {
-    month: "short",
-    day: "numeric",
-  });
+function formatTime(ms: number) {
+  const d = new Date(ms);
+  return (
+    d.toLocaleDateString(undefined, { month: "short", day: "numeric" }) +
+    " " +
+    d.getHours() +
+    ":00"
+  );
 }
 
 function formatTimeFull(iso: string) {
@@ -61,6 +64,11 @@ export function PlayerHistoryChart({ data }: { data: DataPoint[] }) {
     );
   }
 
+  const chartData = data.map((d) => ({
+    ...d,
+    time: new Date(d.timestamp).getTime(),
+  }));
+
   return (
     <Card>
       <CardHeader>
@@ -68,7 +76,7 @@ export function PlayerHistoryChart({ data }: { data: DataPoint[] }) {
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig} className="h-[300px] w-full">
-          <AreaChart data={data} accessibilityLayer>
+          <AreaChart data={chartData} accessibilityLayer>
             <defs>
               <linearGradient id="playerGradient" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="var(--color-players)" stopOpacity={0.3} />
@@ -77,7 +85,10 @@ export function PlayerHistoryChart({ data }: { data: DataPoint[] }) {
             </defs>
             <CartesianGrid strokeDasharray="3 3" vertical={false} />
             <XAxis
-              dataKey="timestamp"
+              dataKey="time"
+              type="number"
+              scale="time"
+              domain={["dataMin", "dataMax"]}
               tickFormatter={formatTime}
               tickLine={false}
               axisLine={false}
