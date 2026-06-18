@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Timestamp } from "../../components/Timestamp";
+import { PlayerHistoryChart } from "../../components/PlayerHistoryChart";
 
 interface GameDetail {
   app_id: number;
@@ -48,6 +49,18 @@ export default async function GamePage({
     }
   } catch {
     error = "Could not connect to backend.";
+  }
+
+  let history: { players: number; timestamp: string }[] | null = null;
+  try {
+    const res = await fetch(`${backendUrl}/api/games/${appId}/players/history?limit=168`, {
+      cache: "no-store",
+    });
+    if (res.ok) {
+      history = await res.json();
+    }
+  } catch {
+    // history is optional
   }
 
   if (!detail) {
@@ -158,6 +171,13 @@ export default async function GamePage({
             </>
           )}
         </dl>
+
+        <section className="mt-10 space-y-8">
+          <h2 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">
+            Charts
+          </h2>
+          {history && <PlayerHistoryChart data={history} />}
+        </section>
 
         {detail.snapshots_updated_at && (
           <p className="mt-8 text-xs text-zinc-400 dark:text-zinc-600">
