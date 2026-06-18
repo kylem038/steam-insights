@@ -1,7 +1,10 @@
 [X] Containerize the entire app
-[ ] Setup polling logic
+[X] Setup polling logic
 [ ] Start fetching tags associated with each game
 [ ] Setup charts for showing historical data
+[ ] Setup initial unit tests
+[ ] Setup initla integration tests
+[ ] Test getting a game that hasn't released yet
 
 
 Valuable insights on tags:

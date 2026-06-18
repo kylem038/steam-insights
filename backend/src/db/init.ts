@@ -60,8 +60,9 @@ const SCHEMA_SQL = `
   );
 
   CREATE TABLE IF NOT EXISTS game_tags (
-    app_id INTEGER NOT NULL REFERENCES games(app_id),
-    tag_id INTEGER NOT NULL REFERENCES tags(id),
+    app_id  INTEGER NOT NULL REFERENCES games(app_id),
+    tag_id  INTEGER NOT NULL REFERENCES tags(id),
+    ordinal INTEGER NOT NULL DEFAULT 0,
     PRIMARY KEY (app_id, tag_id)
   );
 
@@ -84,5 +85,8 @@ export async function initDb(): Promise<void> {
   console.log("Database initialized: raw_api_responses table ready");
 
   await pool.query(SCHEMA_SQL);
+  await pool.query(
+    "ALTER TABLE game_tags ADD COLUMN IF NOT EXISTS ordinal INTEGER NOT NULL DEFAULT 0",
+  );
   console.log("Database initialized: game schema tables ready");
 }

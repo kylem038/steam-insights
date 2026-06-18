@@ -7,6 +7,7 @@ interface GameDetail {
   release_date: string | null;
   developer: string[];
   publisher: string[];
+  tags: string[];
   current_players: number | null;
   reviews: {
     total: number;
@@ -75,6 +76,26 @@ export default async function GamePage({
         <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 mt-6">
           {detail.name}
         </h1>
+
+        {detail.tags.length > 0 && (
+          <>
+            <h2 className="font-medium text-zinc-500 dark:text-zinc-300 mt-6">Tags</h2>
+            <div className="flex flex-wrap gap-2 mt-3">
+              {detail.tags.map((tag, i) => (
+                <span
+                  key={tag}
+                  className={
+                    i < 5
+                      ? "px-3 py-1 text-xs font-semibold rounded-full bg-zinc-300 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300"
+                      : "px-3 py-1 text-xs font-medium rounded-full bg-zinc-200 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400"
+                  }
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </>
+        )}
 
         <dl className="mt-8 grid grid-cols-[auto_1fr] gap-x-6 gap-y-3 text-zinc-600 dark:text-zinc-400">
           <dt className="font-medium text-zinc-500 dark:text-zinc-300">App ID</dt>
