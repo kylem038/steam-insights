@@ -15,5 +15,8 @@ services:
     volumes:
       - ./frontend/app:/app/app
       - ./frontend/public:/app/public
+      - ./frontend/components:/app/components
+      - ./frontend/lib:/app/lib
+      - ./frontend/node_modules:/app/node_modules
       - ./frontend/next.config.ts:/app/next.config.ts
       - ./frontend/tsconfig.json:/app/tsconfig.json
