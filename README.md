@@ -34,6 +34,8 @@ I will also explore developing some of these algorithms myself, and will always 
 
 The project uses three Compose files to separate concerns:
 
+| File | Purpose |
+|------|---------|
 | `docker-compose.yml` | Shared base (PostgreSQL, ports, environment variables, dependencies between services) |
 | `docker-compose.dev.yml` | Local development overrides (hot-reload via volume mounts, `NODE_ENV=development`) |
 | `docker-compose.prod.yml` | Production overrides (`restart: unless-stopped` on services) |
@@ -50,6 +52,8 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 
 ### Useful commands
 
+| Command | Description |
+|---------|-------------|
 | Start (development) | `docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d` |
 | Start (production) | `docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build` |
 | Stop | `docker compose down` |
@@ -64,3 +68,11 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 - **Frontend:** [http://localhost:3000](http://localhost:3000)
 - **Backend API:** [http://localhost:3001](http://localhost:3001)
 - **PostgreSQL:** `localhost:5432`
+
+### Testing
+
+| Command | Description |
+|---------|-------------|
+| Frontend tests | `docker compose -f docker-compose.yml -f docker-compose.dev.yml exec frontend npm test` |
+| Backend tests | `docker compose -f docker-compose.yml -f docker-compose.dev.yml exec backend npm test` |
+| All tests | `scripts/test-all.sh` |
