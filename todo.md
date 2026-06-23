@@ -2,9 +2,9 @@
 [X] Setup polling logic
 [X] Start fetching tags associated with each game
 [X] Setup charts for showing historical data
-[ ] Check responsive design
+[X] Check responsive design
 [ ] Setup initial unit tests
-[ ] Setup initla integration tests
+[ ] Setup initlal integration tests
 [ ] Test getting a game that hasn't released yet
 
 
