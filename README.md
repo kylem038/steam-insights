@@ -32,13 +32,14 @@ I will also explore developing some of these algorithms myself, and will always 
 
 ### Docker Compose files
 
-The project uses three Compose files to separate concerns:
+The project uses four Compose files to separate concerns:
 
 | File | Purpose |
 |------|---------|
 | `docker-compose.yml` | Shared base (PostgreSQL, ports, environment variables, dependencies between services) |
 | `docker-compose.dev.yml` | Local development overrides (hot-reload via volume mounts, `NODE_ENV=development`) |
 | `docker-compose.prod.yml` | Production overrides (`restart: unless-stopped` on services) |
+| `docker-compose.e2e.yml` | End-to-end testing (mock API service, Playwright container, overrides `BACKEND_URL`) |
 
 Run multiple files together with the `-f` flag:
 
@@ -76,3 +77,35 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 | Frontend tests | `docker compose -f docker-compose.yml -f docker-compose.dev.yml exec frontend npm test` |
 | Backend tests | `docker compose -f docker-compose.yml -f docker-compose.dev.yml exec backend npm test` |
 | All tests | `scripts/test-all.sh` |
+| E2E tests | `scripts/e2e-test.sh` (or `cd frontend && npm run test:e2e`) |
+
+### End-to-end (E2E) tests
+
+E2E tests use Playwright to run a full user flow against a mock backend,
+exercising real Next.js SSR, React hydration, and client-side search.
+
+**How it works:**
+
+`docker-compose.e2e.yml` overrides the frontend's `BACKEND_URL` to point
+to a lightweight mock API server (`frontend/e2e/mock-api/server.mjs`)
+that returns controlled responses for all game endpoints. Playwright runs
+in a headless Chromium browser via the official
+`mcr.microsoft.com/playwright` Docker image.
+
+**Running:**
+
+```sh
+# From the frontend directory
+cd frontend && npm run test:e2e
+
+# From the project root
+scripts/e2e-test.sh
+```
+
+The script runs the tests, then **automatically restores dev services**
+(no manual step needed afterward).
+
+**Test coverage** (`frontend/e2e/tests/home-to-details.spec.ts`):
+page load, client-side search filtering, navigation to a game detail
+page, and verification of name, developer, publisher, price, tags,
+current players, and app ID.
