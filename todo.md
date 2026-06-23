@@ -4,10 +4,20 @@
 [X] Setup charts for showing historical data
 [X] Check responsive design
 [X] Setup initial unit tests
-[ ] Add documentation for running both the frontend and backend unit tests suites
-[ ] Setup initlal integration tests
-[ ] Add documentation for running the integration tests
+[X] Add documentation for running both the frontend and backend unit tests suites
+[X] Setup initlal integration tests
+[X] Add documentation for running the integration tests
+[ ] Setup test SKILL for handling documentation
 [ ] Test getting a game that hasn't released yet
+[ ] First pass at algorithm for estimating wishlists
+[ ] First pass at algorithm for estimating revenue
+[ ] Save wishlist snapshot to estimates table
+[ ] Save revenue snapshot to estimates table
+[ ] Display chart for showing wishlists over time
+[ ] Display chart for showing revenue over time
+
+### Tag compare functionality
+[ ] Spec out tag comparison based on requests from other game devs
 
 
 Valuable insights on tags:

@@ -1,0 +1,28 @@
+services:
+  frontend:
+    environment:
+      BACKEND_URL: http://mock-api:3002
+
+  mock-api:
+    image: node:22-alpine
+    working_dir: /app
+    command: node server.mjs
+    volumes:
+      - ./frontend/e2e/mock-api:/app
+    ports:
+      - "3002:3002"
+
+  playwright:
+    image: mcr.microsoft.com/playwright:v1.52.0
+    working_dir: /app
+    volumes:
+      - ./frontend/e2e:/app
+    depends_on:
+      - frontend
+      - mock-api
+    environment:
+      BASE_URL: http://frontend:3000
+    command:
+      - sh
+      - -c
+      - npm install --ignore-scripts && npx playwright test
