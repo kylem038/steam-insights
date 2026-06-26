@@ -7,7 +7,7 @@ compatibility: opencode
 
 ## What I do
 
-- Update README with relevant documentation to help other developers know how a feature works
+- Update features.md with relevant documentation to help other developers know how a feature works
 
 ## When to use me
 

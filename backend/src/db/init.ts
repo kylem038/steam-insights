@@ -66,6 +66,16 @@ const SCHEMA_SQL = `
     PRIMARY KEY (app_id, tag_id)
   );
 
+  CREATE TABLE IF NOT EXISTS followers_snapshot (
+    id          SERIAL PRIMARY KEY,
+    app_id      INTEGER NOT NULL REFERENCES games(app_id),
+    timestamp   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    followers   INTEGER NOT NULL
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_followers_snapshot_app_ts
+    ON followers_snapshot (app_id, timestamp);
+
   CREATE TABLE IF NOT EXISTS estimates (
     id                SERIAL PRIMARY KEY,
     app_id            INTEGER NOT NULL REFERENCES games(app_id),
@@ -87,6 +97,12 @@ export async function initDb(): Promise<void> {
   await pool.query(SCHEMA_SQL);
   await pool.query(
     "ALTER TABLE game_tags ADD COLUMN IF NOT EXISTS ordinal INTEGER NOT NULL DEFAULT 0",
+  );
+  await pool.query(
+    "ALTER TABLE games ADD COLUMN IF NOT EXISTS header_image TEXT",
+  );
+  await pool.query(
+    "ALTER TABLE games ADD COLUMN IF NOT EXISTS coming_soon BOOLEAN NOT NULL DEFAULT false",
   );
   console.log("Database initialized: game schema tables ready");
 }

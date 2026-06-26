@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getGame, getGameDetails, getSupportedGames, searchGames } from "../services/games.js";
+import { getGame, getGameDetails, getSupportedGames, searchGames, getFollowerHistory } from "../services/games.js";
 import pool from "../db/pool.js";
 
 const router = Router();
@@ -65,6 +65,21 @@ router.get("/:appId/players/history", async (req, res, next) => {
         timestamp: r.timestamp,
       })),
     );
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get("/:appId/followers/history", async (req, res, next) => {
+  try {
+    const appId = Number(req.params.appId);
+    if (Number.isNaN(appId)) {
+      res.status(400).json({ error: "Invalid appId" });
+      return;
+    }
+    const limit = Math.min(Number(req.query.limit) || 168, 720);
+    const rows = await getFollowerHistory(appId, limit);
+    res.json(rows);
   } catch (err) {
     next(err);
   }

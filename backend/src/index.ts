@@ -8,6 +8,7 @@ import {
   startPlayerPoller,
   startReviewPoller,
   startPricePoller,
+  startFollowerPoller,
 } from "./services/poller.js";
 
 const app = express();
@@ -33,6 +34,7 @@ try {
   startPlayerPoller(appIds);
   startReviewPoller(appIds);
   startPricePoller(appIds);
+  startFollowerPoller(appIds);
 } catch (err) {
   console.error("Failed to initialize:", (err as Error).message);
 }

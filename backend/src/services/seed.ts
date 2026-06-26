@@ -3,6 +3,7 @@ import {
   fetchCurrentPlayers,
   fetchReviewsSummary,
   fetchGameTags,
+  fetchFollowerCount,
 } from "./steam.js";
 import {
   upsertGame,
@@ -10,6 +11,7 @@ import {
   storeReviewSnapshot,
   storePriceSnapshot,
   storeGameTags,
+  storeFollowerSnapshot,
 } from "./games.js";
 
 export async function seedGame(appId: number): Promise<void> {
@@ -30,6 +32,8 @@ export async function seedGame(appId: number): Promise<void> {
     releaseDate: details.value.release_date.date,
     developers: details.value.developers,
     publishers: details.value.publishers,
+    headerImage: details.value.header_image ?? null,
+    comingSoon: details.value.release_date.coming_soon,
   });
 
   if (currentPlayers.status === "fulfilled") {
@@ -61,6 +65,14 @@ export async function seedGame(appId: number): Promise<void> {
     }
   } catch (err) {
     console.warn(`Seed: could not fetch tags for ${appId}:`, (err as Error).message);
+  }
+
+  try {
+    const followers = await fetchFollowerCount(appId);
+    await storeFollowerSnapshot(appId, followers);
+    console.log(`Seed: stored ${followers} followers for "${details.value.name}" (${appId})`);
+  } catch (err) {
+    console.warn(`Seed: could not fetch followers for ${appId}:`, (err as Error).message);
   }
 
   console.log(`Seed: upserted game "${details.value.name}" (${appId})`);

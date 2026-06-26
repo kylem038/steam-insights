@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { Timestamp } from "../../components/Timestamp";
 import { PlayerHistoryChart } from "../../components/PlayerHistoryChart";
+import { FollowerChart } from "../../components/FollowerChart";
+import { GameHeaderImage } from "../../components/GameHeaderImage";
 
 interface GameDetail {
   app_id: number;
@@ -8,6 +10,8 @@ interface GameDetail {
   release_date: string | null;
   developer: string[];
   publisher: string[];
+  header_image: string | null;
+  coming_soon: boolean;
   tags: string[];
   current_players: number | null;
   reviews: {
@@ -19,6 +23,7 @@ interface GameDetail {
     usd: number;
     discount_percent: number;
   } | null;
+  followers: number | null;
   snapshots_updated_at: string | null;
 }
 
@@ -63,6 +68,18 @@ export default async function GamePage({
     // history is optional
   }
 
+  let followerHistory: { followers: number; timestamp: string }[] | null = null;
+  try {
+    const res = await fetch(`${backendUrl}/api/games/${appId}/followers/history?limit=168`, {
+      cache: "no-store",
+    });
+    if (res.ok) {
+      followerHistory = await res.json();
+    }
+  } catch {
+    // follower history is optional
+  }
+
   if (!detail) {
     return <NotFoundPage appId={appId} error={error} />;
   }
@@ -80,11 +97,7 @@ export default async function GamePage({
           &larr; Back to home
         </Link>
 
-        <img
-          src={`https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/${detail.app_id}/header.jpg`}
-          alt={`${detail.name} header image`}
-          className="mt-6 w-full max-w-lg rounded-xl"
-        />
+        {detail.header_image && <GameHeaderImage src={detail.header_image} name={detail.name} />}
 
         <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 mt-6">
           {detail.name}
@@ -126,8 +139,10 @@ export default async function GamePage({
         <dl className="grid grid-cols-[auto_1fr] gap-x-6 gap-y-3 text-zinc-600 dark:text-zinc-400">
           <dt className="font-medium text-zinc-500 dark:text-zinc-300">Current players</dt>
           <dd>{detail.current_players?.toLocaleString() ?? "\u2014"}</dd>
+          <dt className="font-medium text-zinc-500 dark:text-zinc-300">Followers</dt>
+          <dd>{detail.followers?.toLocaleString() ?? "\u2014"}</dd>
 
-          {detail.reviews && (
+          {detail.reviews && detail.reviews.total > 0 && (
             <>
               <dt className="font-medium text-zinc-500 dark:text-zinc-300">Total reviews</dt>
               <dd>{detail.reviews.total.toLocaleString()}</dd>
@@ -176,7 +191,8 @@ export default async function GamePage({
           <h2 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">
             Charts
           </h2>
-          {history && <PlayerHistoryChart data={history} />}
+          {!detail.coming_soon && history && <PlayerHistoryChart data={history} />}
+          {followerHistory && <FollowerChart data={followerHistory} />}
         </section>
 
         {detail.snapshots_updated_at && (
