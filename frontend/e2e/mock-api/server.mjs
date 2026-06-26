@@ -15,6 +15,13 @@ const MOCK_GAMES = [
     developer: ["Another Dev"],
     publisher: ["Another Publisher"],
   },
+  {
+    app_id: 654321,
+    name: "Unreleased Game",
+    release_date: "2026",
+    developer: ["Unreleased Dev"],
+    publisher: ["Unreleased Publisher"],
+  },
 ];
 
 const MOCK_DETAILS = {
@@ -27,14 +34,37 @@ const MOCK_DETAILS = {
     tags: ["tag1", "tag2", "tag3"],
     description: "A test game for integration testing",
     header_image: "https://example.com/image.jpg",
+    coming_soon: false,
     price: { usd: 1999, discount_percent: 0 },
     reviews: { total: 1000, positive: 850, negative: 150 },
     current_players: 5000,
+    followers: null,
+    snapshots_updated_at: null,
+  },
+  654321: {
+    app_id: 654321,
+    name: "Unreleased Game",
+    release_date: "2026",
+    developer: ["Unreleased Dev"],
+    publisher: ["Unreleased Publisher"],
+    tags: [],
+    description: "An unreleased game for testing",
+    header_image: "https://example.com/unreleased.jpg",
+    coming_soon: true,
+    price: null,
+    reviews: null,
+    current_players: null,
+    followers: 5938,
     snapshots_updated_at: null,
   },
 };
 
 const MOCK_HISTORY = [];
+
+const MOCK_FOLLOWER_HISTORY = [
+  { followers: 5900, timestamp: "2026-06-25T10:00:00.000Z" },
+  { followers: 5938, timestamp: "2026-06-26T10:00:00.000Z" },
+];
 
 async function parseBody(req) {
   const buffers = [];
@@ -65,6 +95,11 @@ const server = http.createServer((req, res) => {
   const historyMatch = path.match(/^\/api\/games\/(\d+)\/players\/history$/);
   if (req.method === "GET" && historyMatch) {
     return json(res, 200, MOCK_HISTORY);
+  }
+
+  const followerHistoryMatch = path.match(/^\/api\/games\/(\d+)\/followers\/history$/);
+  if (req.method === "GET" && followerHistoryMatch) {
+    return json(res, 200, MOCK_FOLLOWER_HISTORY);
   }
 
   json(res, 404, { error: "Not found" });

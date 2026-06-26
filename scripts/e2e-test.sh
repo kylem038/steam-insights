@@ -10,7 +10,7 @@ docker compose \
   -f docker-compose.yml \
   -f docker-compose.dev.yml \
   -f docker-compose.e2e.yml \
-  up --force-recreate --abort-on-container-exit --exit-code-from playwright
+  up --force-recreate --build --abort-on-container-exit --exit-code-from playwright
 
 EXIT_CODE=$?
 
