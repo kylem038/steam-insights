@@ -7,8 +7,8 @@
 [X] Add documentation for running both the frontend and backend unit tests suites
 [X] Setup initlal integration tests
 [X] Add documentation for running the integration tests
-[ ] Setup test SKILL for handling documentation
-[ ] Test getting a game that hasn't released yet
+[X] Setup test SKILL for handling documentation
+[X] Test getting a game that hasn't released yet
 [ ] First pass at algorithm for estimating wishlists
 [ ] First pass at algorithm for estimating revenue
 [ ] Save wishlist snapshot to estimates table

@@ -2,16 +2,19 @@ import {
   PLAYER_POLL_INTERVAL_MS,
   REVIEW_POLL_INTERVAL_MS,
   PRICE_POLL_INTERVAL_MS,
+  FOLLOWER_POLL_INTERVAL_MS,
 } from "../config.js";
 import {
   fetchCurrentPlayers,
   fetchReviewsSummary,
   fetchAppDetails,
+  fetchFollowerCount,
 } from "./steam.js";
 import {
   storePlayerSnapshot,
   storeReviewSnapshot,
   storePriceSnapshot,
+  storeFollowerSnapshot,
 } from "./games.js";
 
 function startPoller(
@@ -77,5 +80,13 @@ export function startPricePoller(appIds: number[]): void {
         `[poller:price] ${appId}: $${(details.price_overview.final / 100).toFixed(2)}`,
       );
     }
+  });
+}
+
+export function startFollowerPoller(appIds: number[]): void {
+  startPoller("followers", appIds, FOLLOWER_POLL_INTERVAL_MS, async (appId) => {
+    const count = await fetchFollowerCount(appId);
+    await storeFollowerSnapshot(appId, count);
+    console.log(`[poller:followers] ${appId}: ${count} followers`);
   });
 }

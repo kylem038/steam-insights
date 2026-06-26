@@ -21,6 +21,7 @@ export interface SteamAppDetailsResponse {
       publishers: string[];
       categories: { id: number; description: string }[];
       genres: { id: string; description: string }[];
+      header_image?: string;
       achievements?: { total: number };
       recommendations?: { total: number };
       metacritic?: { score: number; url: string };
@@ -120,6 +121,33 @@ export async function fetchGameTags(appId: number): Promise<string[]> {
     if (tag && !tags.includes(tag)) tags.push(tag);
   }
   return tags;
+}
+
+export interface FollowerCountResponse {
+  memberCount: number;
+}
+
+export async function fetchFollowerCount(appId: number): Promise<number> {
+  const hubRes = await fetch(`https://steamcommunity.com/app/${appId}`, {
+    headers: { "Accept": "text/html" },
+  });
+  if (!hubRes.ok) throw new Error(`Steam community hub returned ${hubRes.status}`);
+  const html = await hubRes.text();
+  const match = html.match(/&quot;CLANSTEAMID&quot;:&quot;(\d+)&quot;/);
+  if (!match) throw new Error(`Could not find CLANSTEAMID for app ${appId}`);
+  const clanSteamId = match[1];
+
+  const xmlRes = await fetch(
+    `https://steamcommunity.com/gid/${clanSteamId}/memberslistxml/?xml=1`,
+  );
+  if (!xmlRes.ok) throw new Error(`Steam memberslistxml returned ${xmlRes.status}`);
+  const xml = await xmlRes.text();
+  const countMatch = xml.match(/<memberCount>(\d+)<\/memberCount>/);
+  if (!countMatch) throw new Error(`Could not find memberCount for app ${appId}`);
+  const count = Number(countMatch[1]);
+
+  await storeRawResponse("followers", appId, { clanSteamId, followers: count });
+  return count;
 }
 
 export async function fetchAchievementPercentages(appId: number): Promise<AchievementPercentagesResponse["achievementpercentages"]["achievements"]> {

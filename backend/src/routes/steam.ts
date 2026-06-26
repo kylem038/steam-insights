@@ -31,6 +31,8 @@ router.get("/:appId", async (req, res, next) => {
         releaseDate: appDetails.release_date.date,
         developers: appDetails.developers,
         publishers: appDetails.publishers,
+        headerImage: appDetails.header_image ?? null,
+        comingSoon: appDetails.release_date.coming_soon,
       });
     }
 
