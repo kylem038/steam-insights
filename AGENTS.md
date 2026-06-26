@@ -39,3 +39,9 @@ cd backend && npm run dev         # Express 5 on http://localhost:3001
 ## Project state
 
 Early-stage scaffold. The frontend is the default `create-next-app` template. The backend has Express installed and a basic server running (hits Steam API at `/api/steam/balatro`). The database directory is empty — the only DB setup is the `docker-compose.yml`.
+
+## TODO documentation
+
+When the user mentions updating `todo.md` or marks items as completed, load the
+`documentcode` skill and document only the most recently completed item in
+`features.md`.
