@@ -46,6 +46,16 @@ docker compose down
 | Frontend | http://localhost:3000 |
 | Backend  | http://localhost:3001 |
 
+### Cache revalidation
+
+The home page uses ISR with 24-hour revalidation. After adding new games via
+the backend, purge the cache so they appear immediately:
+
+```sh
+# Uses FRONTEND_URL and REVALIDATION_SECRET from your environment
+curl "$FRONTEND_URL/api/revalidate?secret=$REVALIDATION_SECRET"
+```
+
 ### Testing
 
 ```sh

@@ -16,3 +16,12 @@ Replaced the `<img>` tag in `GameHeaderImage.tsx` with Next.js's `<Image>` compo
 **Key files:**
 - `frontend/app/components/GameHeaderImage.tsx` — Uses `<Image>` with explicit `width={460}`, `height={215}`, responsive sizing, and `onError` fallback
 - `frontend/next.config.ts` — `remotePatterns` for 6 Steam CDN domains; `qualities: [75]`
+
+## Time-Based Revalidation (ISR)
+
+Replaced `force-dynamic` on the home page with 24-hour ISR (`revalidate: 86400`). Added on-demand cache purging via `revalidateTag` with a tagged fetch and a route handler, so new games appear immediately without waiting for the ISR window.
+
+**Key files:**
+- `frontend/app/page.tsx` — `revalidate: 86400` instead of `force-dynamic`; fetch tagged with `["games"]`
+- `frontend/app/api/revalidate/route.ts` — Route handler that calls `revalidateTag(tag, "max")` protected by a secret
+- `frontend/.env` — `REVALIDATION_SECRET` environment variable
