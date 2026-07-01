@@ -8,3 +8,11 @@ Gracefully handles games that haven't released yet on Steam. When `release_date.
 - `frontend/app/games/[appId]/page.tsx` — Conditional rendering based on `coming_soon`
 - `backend/src/db/init.ts` — Schema migration adding `coming_soon` column
 - `backend/src/services/games.ts` — Backend service with `coming_soon` field
+
+## Next.js Image Component
+
+Replaced the `<img>` tag in `GameHeaderImage.tsx` with Next.js's `<Image>` component for automatic image optimization. Configured `remotePatterns` in `next.config.ts` for Steam CDN domains and set `qualities: [75]` (required by Next.js 16).
+
+**Key files:**
+- `frontend/app/components/GameHeaderImage.tsx` — Uses `<Image>` with explicit `width={460}`, `height={215}`, responsive sizing, and `onError` fallback
+- `frontend/next.config.ts` — `remotePatterns` for 6 Steam CDN domains; `qualities: [75]`
