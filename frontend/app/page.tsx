@@ -8,7 +8,7 @@ interface Game {
   publisher: string[];
 }
 
-export const dynamic = "force-dynamic";
+export const revalidate = 86400;
 
 export default async function Home() {
   const backendUrl = process.env.BACKEND_URL ?? "http://localhost:3001";
@@ -18,7 +18,7 @@ export default async function Home() {
 
   try {
     const res = await fetch(`${backendUrl}/api/games/supported`, {
-      next: { revalidate: 3600 },
+      next: { tags: ["games"] },
     });
     if (res.ok) {
       games = await res.json();

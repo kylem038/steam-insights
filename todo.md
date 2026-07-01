@@ -10,7 +10,7 @@
 [X] Setup test SKILL for handling documentation
 [X] Test getting a game that hasn't released yet
 [X] Images should use Image component from NextJS
-[ ] Re-check whether we need force-dynamic - use time based revalidation
+[X] Re-check whether we need force-dynamic - use time based revalidation
 [ ] First pass at algorithm for estimating wishlists
 [ ] First pass at algorithm for estimating revenue
 [ ] Save wishlist snapshot to estimates table
