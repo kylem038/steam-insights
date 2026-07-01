@@ -18,15 +18,47 @@ docker-compose.yml   PostgreSQL 18 for local dev
 - **Next.js 16**: breaking changes from prior versions. Read `node_modules/next/dist/docs/01-app/` before writing code. See `frontend/AGENTS.md`.
 - **Express 5**: also has breaking changes from v4 (`app.listen` signature, middleware API, etc.).
 
-## Local dev
+## Local dev (Docker only)
+
+Everything runs inside Docker containers — never run npm/node commands directly on the host.
 
 ```sh
-docker compose up -d              # start PostgreSQL on port 5432
-cd frontend && npm run dev        # Next.js on http://localhost:3000
-cd frontend && npm run lint       # ESLint 9 flat config
-cd frontend && npm run build      # production build
-cd frontend && npm start          # production server
-cd backend && npm run dev         # Express 5 on http://localhost:3001
+# Start (development)
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+
+# Restart a single service (e.g., after next.config.ts changes)
+docker compose -f docker-compose.yml -f docker-compose.dev.yml restart frontend
+
+# Rebuild and start (production)
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+
+# View logs
+docker compose logs -f
+
+# Stop
+docker compose down
+```
+
+### Access
+
+| Service  | URL |
+|----------|-----|
+| Frontend | http://localhost:3000 |
+| Backend  | http://localhost:3001 |
+
+### Testing
+
+```sh
+# Frontend / backend unit tests
+docker compose -f docker-compose.yml -f docker-compose.dev.yml exec frontend npm test
+docker compose -f docker-compose.yml -f docker-compose.dev.yml exec backend  npm test
+
+# All unit tests
+scripts/test-all.sh
+
+# E2E tests (also restores dev services afterward)
+cd frontend && npm run test:e2e
+# or: scripts/e2e-test.sh
 ```
 
 ## Stack quirks
@@ -38,7 +70,7 @@ cd backend && npm run dev         # Express 5 on http://localhost:3001
 
 ## Project state
 
-Early-stage scaffold. The frontend is the default `create-next-app` template. The backend has Express installed and a basic server running (hits Steam API at `/api/steam/balatro`). The database directory is empty — the only DB setup is the `docker-compose.yml`.
+Early-stage scaffold. All services run in Docker (frontend, backend, PostgreSQL). The frontend uses Next.js 16 in the App Router, the backend is Express 5 with tsx watch for hot-reload, and PostgreSQL 18 stores game data.
 
 ## TODO documentation
 
